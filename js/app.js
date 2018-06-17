@@ -41,7 +41,6 @@ function shuffle(array) {
 const cardList = document.querySelectorAll('.card');
 let open = [];
 let bingo = [];
-let matching = [];
 let openIndex = 0;
 
 for(let i = 0;i < cardList.length; i++){
@@ -50,44 +49,48 @@ for(let i = 0;i < cardList.length; i++){
 
 function openCard(card){
     card.target.classList.add('open','show');
+    console.log(open);
     addOpen(card);
 }
 
 function addOpen(card){
-    open[openIndex] = card.target.innerHTML;
+    open[openIndex] = card.target;
     console.log(openIndex);
-    console.log(open);
+    console.log(open,open.length);
     openIndex++;
-    // inspection(card);    
-    bingoFun(card);    
-    mistake(card);
+    inspection(card);    
 }
 
-function mistake(card){
-    for(let cards of open){
-        if(cards !== card.target.innerHTML){
-            open.splice(0,2);
-            openIndex = 0;
-            setTimeout(function(){
-                for(let i = 0;i < cardList.length; i++){
-                    cardList[i].classList.remove('open','show');
-                }
-            },1000);
+function inspection(card){
+    if(open.length = 2){
+        for(let cards of open){
+            if(cards.innerHTML === card.target.innerHTML){
+                bingoFun(card);
+            } else {
+                mistake(card);
+            }
         }
     }
 }
-
-// function inspection(card){
-//     bingoFun(card);
-// }
 
 function bingoFun(card){
     for(let cards of open){
         if(cards === card.target.innerHTML){
             
-            bingo.concat(open);
-            console.log(bingo);
+            console.log(1);
         }
     }
 }
 
+function mistake(card){
+    for(let cards of open){
+        if(cards.innerHTML !== card.target.innerHTML){
+            setTimeout(function(){
+                open[0].classList.remove('open','show');
+                open[1].classList.remove('open','show');
+                open.splice(0,2);
+                openIndex = 0;
+            },1000);
+        }
+    }
+}
