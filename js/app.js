@@ -1,14 +1,54 @@
-/*
- * 创建一个包含所有卡片的数组
- */
+
+function resetCard(){
+    /*
+    * 创建一个包含所有卡片的数组
+    */
+    const cardList = document.querySelectorAll('.card');
+    const cards = [].slice.call(cardList); 
+    /*
+    * 显示页面上的卡片
+    *   - 使用下面提供的 "shuffle" 方法对数组中的卡片进行洗牌
+    *   - 循环遍历每张卡片，创建其 HTML
+    *   - 将每张卡的 HTML 添加到页面
+    */
+
+    cards.forEach(function(card){
+        card.classList.add('open','show');
+    });
+    
+    shuffle(cards);
+    
+    
+    const deck = document.querySelector('.deck');
+    deck.innerHTML = '';
+    
+    for(let x = 0 ; x < cards.length ; x ++){
+        const cardDiv = document.createElement('li');
+        cardDiv.classList.add('card','open','show');
+        cardDiv.innerHTML = cards[x].innerHTML;
+        deck.appendChild(cardDiv);
+    }
+
+    close();
+}
+
+function close(){
+    setTimeout(function(){
+        cards.forEach(function(card){
+            card.classList.remove('open','show');
+        });
+    },1000);
+}
 
 
-/*
- * 显示页面上的卡片
- *   - 使用下面提供的 "shuffle" 方法对数组中的卡片进行洗牌
- *   - 循环遍历每张卡片，创建其 HTML
- *   - 将每张卡的 HTML 添加到页面
- */
+resetCard();
+
+const restart = document.querySelector('.restart');
+
+restart.addEventListener('click',resetCard);
+
+
+
 
 // 洗牌函数来自于 http://stackoverflow.com/a/2450976
 function shuffle(array) {
@@ -26,6 +66,7 @@ function shuffle(array) {
 }
 
 
+
 /*
  * 设置一张卡片的事件监听器。 如果该卡片被点击：
  *  - 显示卡片的符号（将这个功能放在你从这个函数中调用的另一个函数中）
@@ -39,58 +80,11 @@ function shuffle(array) {
 
 
 const cardList = document.querySelectorAll('.card');
-let open = [];
-let bingo = [];
-let openIndex = 0;
+const cards = [].slice.call(cardList); 
 
-for(let i = 0;i < cardList.length; i++){
-    cardList[i].addEventListener('click',openCard);
-}
+console.log(cardList);
+console.log(cards);
 
-function openCard(card){
-    card.target.classList.add('open','show');
-    console.log(open);
-    addOpen(card);
-}
-
-function addOpen(card){
-    open[openIndex] = card.target;
-    console.log(openIndex);
-    console.log(open,open.length);
-    openIndex++;
-    inspection(card);    
-}
-
-function inspection(card){
-    if(open.length = 2){
-        for(let cards of open){
-            if(cards.innerHTML === card.target.innerHTML){
-                bingoFun(card);
-            } else {
-                mistake(card);
-            }
-        }
-    }
-}
-
-function bingoFun(card){
-    for(let cards of open){
-        if(cards === card.target.innerHTML){
-            
-            console.log(1);
-        }
-    }
-}
-
-function mistake(card){
-    for(let cards of open){
-        if(cards.innerHTML !== card.target.innerHTML){
-            setTimeout(function(){
-                open[0].classList.remove('open','show');
-                open[1].classList.remove('open','show');
-                open.splice(0,2);
-                openIndex = 0;
-            },1000);
-        }
-    }
-}
+document.querySelectorAll('.card').addEventListener('click', function (evt) {
+    console.log('A span was clicked with text ' + evt.target.textContent);
+});
