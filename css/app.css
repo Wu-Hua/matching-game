@@ -77,7 +77,19 @@ h1 {
 
 .deck .card.match {
     cursor: default;
-    background: #02ccba;
+    background: blue;
+    font-size: 33px;
+}
+
+.deck .card.true {
+    background: blue;
+    animation: waggle .5s linear 2 alternate;
+}
+
+.deck .card.fault {
+    background: red;
+    animation: waggle .5s linear 2;
+    transform-origin:50% 110%;
     font-size: 33px;
 }
 
@@ -106,4 +118,64 @@ h1 {
 .score-panel .restart {
     float: right;
     cursor: pointer;
+}
+
+/*
+ * Styles for the complete
+ */
+
+.complete {
+    height: 500px;
+    padding-top: 100px;
+}
+
+.complete.hide {
+    display: none;
+}
+
+.complete .right {
+    margin: 0 auto;
+    width: 100px;
+    height: 100px;
+    border-radius: 50px;
+    border: 3px solid #aaa;
+    font-size: 60px;
+    line-height: 100px;
+    color: #02ccba;    
+    text-align: center;
+}
+
+.complete h1 {
+    margin: 0 auto 10px;
+    width: 370px;
+}
+
+.complete p {
+    margin: 0 auto;
+    width: 200px;
+    text-align: center;
+}
+
+.complete button {
+    width: 200px;
+    height: 50px;
+    line-height: 50px;
+    color: #fff;
+    font-size: 20px;
+    background: #02b3e4;
+    border: none;
+    border-radius: 10px;
+    position: relative;
+    left: 50%;
+    top: 30px;
+    margin: -100px;
+    cursor: pointer;
+}
+
+@keyframes waggle {
+    from {transform:rotate(0deg);}
+    25% {transform:rotate(-10deg);}
+    50% {transform:rotate(0deg);}
+    75% {transform:rotate(10deg);}
+    to {transform:rotate(0deg);}
 }
