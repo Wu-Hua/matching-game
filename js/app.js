@@ -33,7 +33,7 @@ function resetCard(){
         cardDiv.innerHTML = cards[x].innerHTML;
         deck.appendChild(cardDiv);
     }
-
+    
     /*
     *  - 3秒钟的记忆时间，然后盖上卡牌
     */
@@ -43,21 +43,15 @@ function resetCard(){
         cards.forEach(function(card){
             card.classList.remove('open','show');
         });
-    },1000);
+        // 盖上卡牌同时启动计数器开始计时
+        timedCount();    
+    },3000);
 }
 
 
 resetCard();
 
-// 重置游戏
-const restart = document.querySelector('.restart');
 
-restart.addEventListener('click',refresh);
-
-// 刷新页面函数
-function refresh(){
-    window.location.reload();
-}
 
 // 洗牌函数来自于 http://stackoverflow.com/a/2450976
 function shuffle(array) {
@@ -76,38 +70,34 @@ function shuffle(array) {
 
 
 /*
-* 创建一个包含所有重置后卡片的数组
+* 创建一个包含已打开未配对的空数组、一个已配对的空数组
 */
-const cardList = document.querySelectorAll('.card');
 const deck = document.querySelector("#deck");
-let cards = [].slice.call(cardList); 
 let openCards = [];
 let matchCards = [];
 let moves = 0;    
 
+/*
+* 卡牌的同一个父元素设置一个事件监听器
+*/
 deck.addEventListener('click',addEvent,true);
 
 function addEvent(card){
     let event = card || window.event;
     let target = event.target || event.srcElement;
     if (target.nodeName === "LI") {
-        if(target.classList.contains('open') === true) {
-            target.removeEventListener('click',addEvent);
-        }
         openCard(target);
     }
 }
-/*
-* 每张卡牌设置一个事件监听器
-*/
-// for(let i = 0; i < cards.length ; i++){
-//     cards[i].addEventListener('click',openCard);
-// }
 
 /*
 * 显示卡片的符号
 */
 function openCard(target){
+    // 卡牌同时拥有‘open’，‘show’类时，不执行以下代码
+    if(target.classList.contains('open','show') === true) {
+        return;
+    }
     target.classList.add('open','show');
     addOpen(target);
 }
@@ -117,35 +107,33 @@ function openCard(target){
 */
 function addOpen(target){
     openCards.push(target);
-    checkCard(target);
+    checkCard(target);    
 }
 
 /*
 * 请检查卡片是否匹配
 */
 function checkCard(target){
+    // 当openCards数组有两对象时执行
     if(openCards.length  === 2) {
-        // 检查卡牌时移除点击卡牌事件，检查
+        // 检查卡牌时移除点击卡牌事件
         deck.removeEventListener('click',addEvent,true);        
         if(target.innerHTML === openCards[0].innerHTML){
             /*
-            * 如果卡片匹配，将卡片从openCards数组中移除,然后添加到matchCards数组中
+            * 如果卡片匹配，将openCards数组清空,然后添加到matchCards数组中，同时添加卡牌点击事件
             */
             openCards[0].classList.add('match');
             target.classList.add('match');
             matchCards.push(openCards[0]);
             matchCards.push(target)
-            console.log(matchCards);
             setTimeout(function(){
                 deck.addEventListener("click",addEvent,true);
-                target.removeEventListener('click',addEvent);
-                openCards[0].removeEventListener('click',addEvent);
                 openCards.pop();
                 openCards.pop();
             },999);
         } else {
             /*
-            * 如果卡片不匹配，将卡片从openCards数组中移除并隐藏卡片的符号
+            * 如果卡片不匹配，将openCards数组清空,并加卡牌点击事件
             */
             openCards[0].classList.add('fault');
             target.classList.add('fault');
@@ -158,17 +146,14 @@ function checkCard(target){
             },999);
         }
         /*
-        * 增加移动计数器并将其显示在页面上
+        * 每检查一次表示增加移动此时，计数器将其显示在页面上
         */
         move();
     }
-    if(target.classList.contains('open') === true) {
-        target.removeEventListener('click',addEvent);
-    }
+    /*
+    * 如果matchCards数组有16张牌，代表所有卡都匹配，则显示带有最终分数的消息
+    */
     if(matchCards.length === 16){
-        /*
-        * 如果所有卡都匹配，则显示带有最终分数的消息
-        */
         complete();
     }
 }
@@ -205,18 +190,21 @@ function complete(){
     const complete = document.querySelector('#complete');
     const container = document.querySelector('.container');
     const button = document.querySelector('button');
-    const moveNum = document.querySelector('#moves');
     const stars = document.querySelector('#stars-number');
-
-
+    const moveNum = document.querySelector('#moves');
+    const timeOver = document.querySelector('#timeOver');
+    
     complete.classList.remove('hide');
 
-    // 重置游戏
-    button.addEventListener('click',refresh);
+    // 游戏结束刷新页面
+    button.addEventListener('click',function(){
+        window.location.reload();
+    });
 
     container.style.display = 'none';
     
     moveNum.innerHTML = moves;
+
     if(moves < 13) {
         stars.innerHTML = '3 Stars.';
     } else if (moves >= 13 && moves < 16) {
@@ -224,4 +212,42 @@ function complete(){
     } else {
         stars.innerHTML = '1  Star.';
     }
+
+    timeOver.innerHTML = time;
+}
+
+// 计时器
+let time = 0;
+let timeText = document.querySelector('#time');
+let t;
+//计时器函数
+function timedCount(){
+    timeText.innerHTML = time;
+    time += 1;
+    t=setTimeout("timedCount()",1000)
+}
+
+
+// 重置游戏
+const restart = document.querySelector('.restart');
+const moveNum = document.querySelector('.moves');
+const star = document.querySelector('.stars');
+
+restart.addEventListener('click',refresh);
+
+// 重置游戏函数
+function refresh(){
+    
+    //清除计时器
+    clearTimeout(t);
+    //重设步数，用时
+    time = 0;
+    moveNum.innerHTML = 0;
+    timeText.innerHTML = 0;
+    stars.innerHTML = '';
+    //重设星星
+    stars.innerHTML = '<li class="star"><i class="fa fa-star"></i></li><li class="star"><i class="fa fa-star"></i></li><li class="star"><i class="fa fa-star"></i></li>';
+
+    //重置卡牌
+    resetCard();    
 }
