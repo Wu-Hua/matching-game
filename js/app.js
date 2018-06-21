@@ -43,7 +43,7 @@ function resetCard(){
         cards.forEach(function(card){
             card.classList.remove('open','show');
         });
-    },3000);
+    },1000);
 }
 
 
@@ -79,77 +79,97 @@ function shuffle(array) {
 * 创建一个包含所有重置后卡片的数组
 */
 const cardList = document.querySelectorAll('.card');
+const deck = document.querySelector("#deck");
 let cards = [].slice.call(cardList); 
-let open = [];
+let openCards = [];
+let matchCards = [];
 let moves = 0;    
 
+deck.addEventListener('click',addEvent,true);
+
+function addEvent(card){
+    let event = card || window.event;
+    let target = event.target || event.srcElement;
+    if (target.nodeName === "LI") {
+        if(target.classList.contains('open') === true) {
+            target.removeEventListener('click',addEvent);
+        }
+        openCard(target);
+    }
+}
 /*
 * 每张卡牌设置一个事件监听器
 */
-for(let i = 0; i < cards.length ; i++){
-    cards[i].addEventListener('click',openCard);
-}
+// for(let i = 0; i < cards.length ; i++){
+//     cards[i].addEventListener('click',openCard);
+// }
 
 /*
 * 显示卡片的符号
 */
-function openCard(card){
-    card.target.classList.add('open','show');
-    addOpen(card);
+function openCard(target){
+    target.classList.add('open','show');
+    addOpen(target);
 }
 
 /*
 * 将卡片添加到状态为 “open” 的 *数组* 中
 */
-function addOpen(card){
-    open.push(card.target);
-    checkCard(card);
+function addOpen(target){
+    openCards.push(target);
+    checkCard(target);
 }
 
 /*
 * 请检查卡片是否匹配
 */
-function checkCard(card){
-    if(open.length % 2 === 0){
-        for(let i = 0 ; i < (open.length-1) ; i++ ) {
-            if(open[i].classList.contains('match') === false){
-                if(card.target.innerHTML === open[i].innerHTML){
-                    /*
-                    * 如果卡片匹配，将卡片锁定为 "open" 状态
-                    */
-                    open[i].classList.add('true');
-                    card.target.classList.add('true');
-                    setTimeout(function(){
-                        open[i].classList.remove('show','open','true');
-                        open[i].classList.add('match');
-                        card.target.classList.remove('show','open','true');
-                        card.target.classList.add('match');
-                    },1000);
-                } else {
-                    /*
-                    * 如果卡片不匹配，请将卡片从数组中移除并隐藏卡片的符号
-                    */
-                    open[i].classList.add('fault');
-                    card.target.classList.add('fault');
-                    setTimeout(function(){
-                        open[i].classList.remove('show','open','fault');
-                        card.target.classList.remove('show','open','fault');
-                        open.pop();
-                        open.pop();
-                    },1000);
-                }
-            }
+function checkCard(target){
+    if(openCards.length  === 2) {
+        // 检查卡牌时移除点击卡牌事件，检查
+        deck.removeEventListener('click',addEvent,true);        
+        if(target.innerHTML === openCards[0].innerHTML){
+            /*
+            * 如果卡片匹配，将卡片从openCards数组中移除,然后添加到matchCards数组中
+            */
+            openCards[0].classList.add('match');
+            target.classList.add('match');
+            matchCards.push(openCards[0]);
+            matchCards.push(target)
+            console.log(matchCards);
+            setTimeout(function(){
+                deck.addEventListener("click",addEvent,true);
+                target.removeEventListener('click',addEvent);
+                openCards[0].removeEventListener('click',addEvent);
+                openCards.pop();
+                openCards.pop();
+            },999);
+        } else {
+            /*
+            * 如果卡片不匹配，将卡片从openCards数组中移除并隐藏卡片的符号
+            */
+            openCards[0].classList.add('fault');
+            target.classList.add('fault');
+            setTimeout(function(){
+                openCards[0].classList.remove('show','open','fault');
+                target.classList.remove('show','open','fault');
+                openCards.pop();
+                openCards.pop();
+                deck.addEventListener("click",addEvent,true);
+            },999);
         }
         /*
         * 增加移动计数器并将其显示在页面上
         */
         move();
-        if(open.length === 16){
-            /*
-            * 如果所有卡都匹配，则显示带有最终分数的消息
-            */
-            complete();
-        }
+    }
+    if(target.classList.contains('open') === true) {
+        target.removeEventListener('click',addEvent);
+    }
+    if(matchCards.length === 16){
+        /*
+        * 如果所有卡都匹配，则显示带有最终分数的消息
+        */
+        complete();
     }
 }
 

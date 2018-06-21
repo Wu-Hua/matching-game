@@ -79,10 +79,12 @@ h1 {
     cursor: default;
     background: blue;
     font-size: 33px;
+    animation: waggle .5s linear 2 alternate;
 }
 
 .deck .card.true {
     background: blue;
+    font-size: 33px;
     animation: waggle .5s linear 2 alternate;
 }
 
@@ -101,6 +103,11 @@ h1 {
     text-align: left;
     width: 345px;
     margin-bottom: 10px;
+}
+
+.score-panel .time {
+    display: inline;
+    margin-left: 10px;
 }
 
 .score-panel .stars {
